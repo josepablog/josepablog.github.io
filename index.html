@@ -88,7 +88,10 @@
         var sublists = split(entries, "TYPE");
         var description_lp = "Conferences involve three stringent peer reviews of the full paper — not just the abstract — including suggested revisions. Publication in these proceedings is considered archival. For example, EDM2014 accepted only 17% (24 out of 142) of the full paper submissions";
         
-        var categories = [ ["full", "Long Papers", description_lp],  ["other", "Other", "Short Papers, Workshop papers, etc."], ["thesis", "Theses", ""]];//getSortedKeys(sublists, false));
+        var categories = [ ["book_chapter", "Book Chapters", "I have published in machine learning, data science and education venues"],
+                           ["full", "Long Papers", description_lp],
+                           ["other", "Other", "Short Papers, Workshop papers, etc."],
+                           ["thesis", "Theses", ""] ]; //getSortedKeys(sublists, false));
 
         var ans = []
         
@@ -102,13 +105,13 @@
             {
                 for (var j = 0; j < sublists[category[0]].length; j++)
                     sublists[category[0]][j].AUTHOR = sublists[category[0]][j].AUTHOR.replace(/ and /gi, ", ");
-                
+
                 ans.push ( {"categoryName": category[1], "Start": start,"Items": sublists[category[0]].sort( function(a, b) {return b.YEAR - a.YEAR  } ), "description": category[2]} );
                 start += sublists[category[0]].length;
             }
         }
-        console.log(ans)
         // { "Categories": [ {"categoryName": "other", "Items":[{"AUTHORS": "Gonzalez" }, {"AUTHORS": "Gonzalez" }]}, {"categoryName": "full", "Items": [{"AUTHORS": "Huang"}]}  ] } ;
+
         return {"Categories": ans} ;
     }
     
@@ -134,7 +137,7 @@
 	$(document).ready(function()
                       {
                         publication_template = $("#publication_template").html(); //global var
-                        $.get('bibliography.bib', render_bib, 'text');
+                        $.get('bibliography.bib', render_bib, 'text', cache=false);
                       });
     </script>
 	
@@ -172,7 +175,7 @@
          <div class="banner-text">
             <img class="profile-pic"  src="images/profilepic.jpg" alt="" />
             <h1 class="responsive-headline">Hi!&nbsp;  I'm Jos&eacute;.</h1>
-            <h3>I am a researcher passionate of helping people make better decisions with data.
+            <h3> Artificial intelligence & machine learning published author &#x25CF;  Kaggle Data Science Competition <a href="http://blog.kaggle.com/2011/03/25/jose-p-gonzalez-brenes-and-matias-cortes-on-winning-the-rta-challenge/">First Prize</a> Winner &#x25CF; Education & Technology
 	           
 	           <!-- </a> and learn more <a class="smoothscroll" href="#about">about me</a>. -->
 			</h3>
@@ -210,16 +213,16 @@
 
             <h2>About Dr. Gonz&aacute;lez-Brenes</h2>
 
-            <p>My research addresses real-life problems in communities with principled quantitative methods.
+            <p>I design solutions for real-life problems in communities with principled quantitative methods.
             My main interest is developing models that are not only accurate but also actionable.
             I  focus on educational applications, and
-            I currently work as a research scientist at Pearson's  <a href="http://researchnetwork.pearson.com/digital-data-analytics-and-adaptive-learning"> School Research Innovation Network</a>.            </p>
+            I currently work as a data scientist  at <a href="http://www.chegg.com">Chegg</a>'s Graph, Modeling and Personalization team. </p>
             
             <p>
-            My work has been recognized in the scientific and popular literature.
-            For example, I have  been nominated for best paper awards in the <a href="http:/educationaldatamining.org/">International Educational Data Mining </a> and the <a href="http://www.sigdial.org/">Special Interest Group of Dialogue Systems</a> conferences.
-            I also have presented in <a href="http://www.aistats.org/"> Artificial Intelligence & Statistics </a>, an honor for only 6% of the submissions (out of 400+ submissions).
-            I  am the happy first-prize winner of a 350+ international team data mining competition, predicting <a href="https://www.kaggle.com/c/RTA"> sudden traffic changes </a>.
+            My work has been recognized by the machine learning scientific community and the popular media.
+            For example, I have presented at <a href="http://www.aistats.org/"> Artificial Intelligence & Statistics</a>, an honor for only 6% of the submissions of the conference (out of 400+ papers).
+            I have also been nominated for best paper awards in the <a href="http:/educationaldatamining.org/">International Educational Data Mining </a> and the <a href="http://www.sigdial.org/">Special Interest Group of Dialogue Systems</a> conferences.
+            I  am the happy first-prize winner of a  <a href="http://www.kaggle.com">Kaggle competition </a> against 350+ international teams predicting <a href="https://www.kaggle.com/c/RTA"> sudden traffic changes </a>.
         
         
             </p>
@@ -412,13 +415,13 @@
 
                      <li>
                          <blockquote>
-                             <p> I will be attending the Heidelberg Laureaute Forum </p>
+                             <p> I am helping organize the <a href="http://www.meetup.com/degree"> Data Science in Education Group</a> in the San Francisco Bay Area </p>
                          </blockquote>
                      </li>
                      
                      <li>
                          <blockquote>
-                             <p> I am relocating to San Diego, CA </p>
+                             <p> Our handbook chapter is out. Check it out! </p>
                          </blockquote>
                      </li>
 
@@ -439,7 +442,7 @@
 <!-- Resume Section
  ================================================== -->
 <section id="publications">
-    <h1 class="title">I have published in machine learning and educational venues.  You can download my <a href="bibliography.bib"> bibtex </a>.</h1>
+    <h1 class="title">You can download my <a href="bibliography.bib"> bibtex </a>.</h1>
 
          <!-- <div class="nine columns main-col">
   Some representative papers are:
@@ -476,6 +479,7 @@
                             {{#NOTE}}<span class="label label-default"> {{NOTE}} </span>{{/NOTE}}
                             </br>
                             <span class="info"> {{AUTHOR}}  <span>&nbsp;&bull;&nbsp;</span> <em class="date"> {{YEAR}} </em>  </br>
+                            {{#EDITOR}} {{EDITOR}} (eds) </br> {{/EDITOR}}
                             {{BOOKTITLE}}{{JOURNAL}}
                             <div class="btn-group">
                                 {{#URL}} <a href="{{URL}}"  data-toggle="modal" class="btn btn-default btn-xs"> pdf </a> {{/URL}}
