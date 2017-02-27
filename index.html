@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+
+   <!--- Basic Page Needs
+   ================================================== -->
+   <meta charset="utf-8">
+	<title>Jos&eacute; P. Gonz&aacute;lez-Brenes, Data Scientist. Educational Data Mining.</title>
+	<meta name="description" content="">
+	<meta name="author" content="">
+
+   <!-- Mobile Specific Metas
+   ================================================== -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<!-- CSS
+    ================================================== -->
+   <link rel="stylesheet" href="css/default.css">
+   <link rel="stylesheet" href="css/layout.css">
+   <link rel="stylesheet" href="css/media-queries.css">
+   <link rel="stylesheet" href="css/magnific-popup.css">
+   <link rel="stylesheet" href="css/bootstrap.min.css">
+        
+   <!-- Script
+   ================================================== -->
+   
+    <script>
+       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+        
+        ga('create', 'UA-22285864-1', 'auto');
+        ga('require', 'displayfeatures');
+        ga('send', 'pageview');
+        
+    </script>
+   
+	<script src="js/modernizr.js"></script>
+    <script src="js/parse-bibtex.js"></script>
+    <script src="js/mustache.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="js/jquery-1.10.2.min.js"><\/script>')</script>
+
+
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+        
+        MathJax.Hub.Config({
+                           tex2jax: { inlineMath: [['$','$'],['\\(','\\)']] },
+                           showMathMenu: false,
+                           skipStartupTypeset: true
+                           });
+        
+        </script>
+    <script>
+        
+    function getSortedKeys(obj, asc)
+    {
+        var keys = []; for(var key in obj) keys.push(key);
+        if (asc)
+            return keys.sort();
+        else
+            return keys.sort().reverse();
+        
+    }
+    
+    function split(list, criteria)
+    {
+        var sublists = [];
+        for (var name in list)
+        {
+            var entry = list[name];
+            var key = entry[criteria].toLowerCase();
+
+            if (!(key in sublists))
+                sublists[key] = [];
+            sublists[key].push( entry );
+            entry.name = name;
+        }
+        return sublists;
+    }
+    
+    function sort_by_type(entries)
+    {
+        var sublists = split(entries, "TYPE");
+        var description_lp = "Conferences involve three stringent peer reviews of the full paper — not just the abstract — including suggested revisions. Publication in these proceedings is considered archival. For example, EDM2014 accepted only 17% (24 out of 142) of the full paper submissions";
+        
+        var categories = [ ["full", "Long Papers", description_lp],  ["other", "Other", "Short Papers, Workshop papers, etc."], ["thesis", "Theses", ""]];//getSortedKeys(sublists, false));
+
+        var ans = []
+        
+        
+        var start = 1;
+        for (var i = 0; i < categories.length; i++)
+        {
+            category = categories[i];
+
+            if (Object.keys(sublists).indexOf(category[0]) >=0 )
+            {
+                for (var j = 0; j < sublists[category[0]].length; j++)
+                    sublists[category[0]][j].AUTHOR = sublists[category[0]][j].AUTHOR.replace(/ and /gi, ", ");
+                
+                ans.push ( {"categoryName": category[1], "Start": start,"Items": sublists[category[0]].sort( function(a, b) {return b.YEAR - a.YEAR  } ), "description": category[2]} );
+                start += sublists[category[0]].length;
+            }
+        }
+        console.log(ans)
+        // { "Categories": [ {"categoryName": "other", "Items":[{"AUTHORS": "Gonzalez" }, {"AUTHORS": "Gonzalez" }]}, {"categoryName": "full", "Items": [{"AUTHORS": "Huang"}]}  ] } ;
+        return {"Categories": ans} ;
+    }
+    
+    function clean(str)
+    {
+        return str.replace(/\{|\}/gi, "").replace("---", "&mdash;").replace(/\\&#39;(.)/gi, "&$1acute;");
+        //.replace("\'{e}", "&eacute;").replace("\'a", "&aacute;").replace("\'e", "&eacute;").replace("---", "&mdash;");
+    }
+    function render_bib(plain_bibtex)
+    {
+        var entries = doParse(plain_bibtex);
+        delete entries["@comments"];
+        
+        var publications = sort_by_type(entries);
+        var target = $("#publication_template");
+
+        var cats = clean(Mustache.to_html(publication_template, publications));
+        target.html(cats);
+        MathJax.Hub.Queue(["Typeset",MathJax.Hub,"publication_template"])
+    }
+    
+
+	$(document).ready(function()
+                      {
+                        publication_template = $("#publication_template").html(); //global var
+                        $.get('bibliography.bib', render_bib, 'text');
+                      });
+    </script>
+	
+   
+   <!-- Favicons
+	================================================== -->
+	<link rel="shortcut icon" href="favicon.png" >
+
+</head>
+
+<body>
+
+   <!-- Header
+   ================================================== -->
+   <header id="home">
+
+      <nav id="nav-wrap">
+
+         <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+	      <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+         <ul id="nav" class="nav">
+            <li class="current"><a class="smoothscroll" href="#home">Home</a></li>
+            <li><a class="smoothscroll" href="#about">About</a></li>
+	         <li><a class="smoothscroll" href="#resume">Education</a></li>
+             <li><a class="smoothscroll" href="#portfolio">Press</a></li>
+	         <li><a class="smoothscroll" href="#publications">Publications</a></li>
+             <!-- <li><a class="smoothscroll" href="#teaching">Teaching</a></li>
+             <li><a class="smoothscroll" href="#service">Service</a></li>-->
+         </ul> <!-- end #nav -->
+
+      </nav> <!-- end #nav-wrap -->
+
+      <div class="row banner">
+         <div class="banner-text">
+            <img class="profile-pic"  src="images/profilepic.jpg" alt="" />
+            <h1 class="responsive-headline">Hi!&nbsp;  I'm Jos&eacute;.</h1>
+            <h3>I am a researcher passionate of helping people make better decisions with data.
+	           
+	           <!-- </a> and learn more <a class="smoothscroll" href="#about">about me</a>. -->
+			</h3>
+            <hr />
+            <ul class="social">
+               <li><a href="mailto:joseg+web@cs.cmu.edu"><i class="fa fa-envelope"></i></a></li>
+               <li><a href="https://github.com/josepablog"><i class="fa fa-github"></i></a></li>
+               <li><a href="https://www.facebook.com/wumpus"><i class="fa fa-facebook"></i></a></li>
+               <li><a href="http://twitter.com/mrjose"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="http://www.linkedin.com/in/josegcmu"><i class="fa fa-linkedin"></i></a></li>
+            </ul>
+         </div>
+      </div>
+
+      <p class="scrolldown">
+         <a class="smoothscroll" href="#about"><i class="icon-down-circle"></i></a>
+      </p>
+
+   </header> <!-- Header End -->
+
+
+   <!-- About Section
+   ================================================== -->
+   <section id="about">
+
+      <div class="row">
+
+         <div class="three columns">
+
+            <!--- <img class="profile-pic"  src="images/profilepic.jpg" alt="" /> -->
+
+         </div>
+
+         <div class="nine columns main-col">
+
+            <h2>About Dr. Gonz&aacute;lez-Brenes</h2>
+
+            <p>My research addresses real-life problems in communities with principled quantitative methods.
+            My main interest is developing models that are not only accurate but also actionable.
+            I  focus on educational applications, and
+            I currently work as a research scientist at Pearson's  <a href="http://researchnetwork.pearson.com/digital-data-analytics-and-adaptive-learning"> School Research Innovation Network</a>.            </p>
+            
+            <p>
+            My work has been recognized in the scientific and popular literature.
+            For example, I have  been nominated for best paper awards in the <a href="http:/educationaldatamining.org/">International Educational Data Mining </a> and the <a href="http://www.sigdial.org/">Special Interest Group of Dialogue Systems</a> conferences.
+            I also have presented in <a href="http://www.aistats.org/"> Artificial Intelligence & Statistics </a>, an honor for only 6% of the submissions (out of 400+ submissions).
+            I  am the happy first-prize winner of a 350+ international team data mining competition, predicting <a href="https://www.kaggle.com/c/RTA"> sudden traffic changes </a>.
+        
+        
+            </p>
+
+
+
+         </div> <!-- end .main-col -->
+
+      </div>
+
+   </section> <!-- About Section End-->
+
+
+   <!-- Resume Section
+   ================================================== -->
+   <section id="resume">
+
+      <!-- Education
+      ----------------------------------------------- -->
+      <div class="row">
+
+         <div class="three columns header-col">
+            <h1><span>Education</span></h1>
+         </div>
+
+         <div class="nine columns main-col">
+
+            <div class="row item">
+
+               <div class="twelve columns">
+
+                  <h3>Carnegie Mellon University</h3>
+                  <p class="info"> Ph.D. in Language Technologies (Computer Science) <span>&bull;</span> <em class="date"> 2013</em></p>
+
+               </div>
+
+            </div> <!-- item end -->
+
+            <div class="row item">
+
+               <div class="twelve columns">
+
+                  <h3>National Tsing Hua University</h3>
+                  <p class="info">IMBA in Technology Management <span>&bull;</span> <em class="date">2007</em></p>
+
+
+               </div>
+
+            </div> <!-- item end -->
+
+            <div class="row item">
+
+               <div class="twelve columns">
+
+                  <h3>Instituto Tecnol&oacute;gico de Costa Rica</h3>
+                  <p class="info">BSc in Computer Science<span>&bull;</span> <em class="date">2003</em></p>
+
+
+               </div>
+
+            </div> <!-- item end -->
+
+
+
+         </div> <!-- main-col end -->
+
+      </div> <!-- End Education -->
+
+
+   
+
+   </section> <!-- Resume Section End-->
+
+
+   <!-- Portfolio Section
+   ================================================== -->
+   <section id="portfolio">
+
+      <div class="row">
+
+         <div class="twelve columns collapsed">
+
+            <h1>Check out some of my appearances in TV, magazines and news</h1>
+
+            <!-- portfolio-wrapper -->
+            <div id="portfolio-wrapper" class="bgrid-quarters s-bgrid-thirds cf">
+
+                <div class="columns portfolio-item">
+                    <div class="item-wrap">
+                        
+                        <a href="http://www.abc.net.au/catalyst/stories/3296837.htm" title="Lucrative algorithms">
+                            <img alt="" src="images/portfolio/abc.png">
+                                <div class="overlay">
+                                    <div class="portfolio-item-meta"> <h5>ABC Australia</h5> <p>Lucrative Algorithms</p></div>
+                                </div>
+                                <div class="link-icon"><i class="icon-plus"></i></div>
+                                </a>
+                        ABC  &mdash; Lucrative Algorithms
+                        
+                    </div>
+                </div> <!-- item end -->
+
+          	   <div class="columns portfolio-item">
+                  <div class="item-wrap">
+
+                     <a href="http://www.newscientist.com/article/mg21128251.500-datacasting-what-will-you-buy-tomorrow.html" title="What will you buy tomorrow? ">
+                        <img alt="" src="images/portfolio/newscientist.jpg">
+                        <div class="overlay">
+                           <div class="portfolio-item-meta"><h5>New Scientist</h5> <p>What will you buy tomorrow? [subscription]</p> </div>
+                        </div>
+                        <div class="link-icon"><i class="icon-plus"></i></div>
+                     </a>
+                     New Scientist &mdash; What will you buy tomorrow?
+
+                  </div>
+          		</div> <!-- item end -->
+
+
+
+               <div class="columns portfolio-item">
+                  <div class="item-wrap">
+
+                     <a href="http://www.zdnet.com.au/cutting-commutes-with-data-mining-339310400.htm" title="">
+                        <img alt="" src="images/portfolio/zdnet.png">
+                        <div class="overlay">
+                           <div class="portfolio-item-meta">
+          					      <h5>Cutting commutes with data mining</h5>
+                              <p>ZDNet</p>
+          					   </div>
+                        </div>
+                        <div class="link-icon"><i class="icon-plus"></i></div>
+                     </a>
+                     ZDNet &mdash; Cutting commutes with data mining
+
+                  </div>
+          		</div> <!-- item end -->
+
+               <div class="columns portfolio-item">
+                  <div class="item-wrap">
+
+                     <a href="http://www.theaustralian.com.au/australian-it/smartphone-used-to-predict-nsw-travel-times/story-e6frgakx-1226034533295" title="">
+                        <img alt="" src="images/portfolio/the-australian.jpg">
+                        <div class="overlay">
+                           <div class="portfolio-item-meta">
+          					      <h5>Smartphones to predict travel times?</h5>
+                              <p>The Australian</p>
+          					   </div>
+                        </div>
+                        <div class="link-icon"><i class="icon-plus"></i></div>
+                     </a>
+                     The Australian &mdash; Smartphones to predict travel times?
+
+                  </div>
+          		</div> <!-- item end -->
+
+
+
+         </div> <!-- twelve columns end -->
+
+
+
+
+
+      </div> <!-- row End -->
+
+   </section> <!-- Portfolio Section End-->
+
+
+
+
+   <!-- Testimonials Section
+   ================================================== -->
+   <section id="testimonials">
+
+      <div class="text-container">
+
+         <div class="row">
+
+            <div class="two columns header-col">
+
+               <h1><span>Client Testimonials</span></h1>
+
+            </div>
+
+            <div class="ten columns flex-container">
+
+               <div class="flexslider">
+
+                  <ul class="slides">
+
+                     <li>
+                         <blockquote>
+                             <p> I will be attending the Heidelberg Laureaute Forum </p>
+                         </blockquote>
+                     </li>
+                     
+                     <li>
+                         <blockquote>
+                             <p> I am relocating to San Diego, CA </p>
+                         </blockquote>
+                     </li>
+
+                  </ul>
+
+               </div> <!-- div.flexslider ends -->
+
+            </div> <!-- div.flex-container ends -->
+
+         </div> <!-- row ends -->
+
+       </div>  <!-- text-container ends -->
+
+   </section> <!-- Testimonials Section End-->
+
+
+
+<!-- Resume Section
+ ================================================== -->
+<section id="publications">
+    <h1 class="title">I have published in machine learning and educational venues.  You can download my <a href="bibliography.bib"> bibtex </a>.</h1>
+
+         <!-- <div class="nine columns main-col">
+  Some representative papers are:
+        <ul>
+            <li> <a href="http://jmlr.org/proceedings/papers/v38/gonzalez-brenes15.pdf"> Modeling Skill Acquisition Over Time with Sequence and Topic Modeling </a> </li>
+            <li> <a href="http://www.cs.cmu.edu/~joseg/files/fast_knowledge_tracing_with_features.pdf"> General Features in Knowledge Tracing: Applications to Multiple Subskills, Temporal Item Response Theory, and Expert Knowledge </a>
+        </ul>
+        
+  </div> -->
+  
+
+
+    
+    <!-- Publications
+     ----------------------------------------------- -->
+    
+    <div id="publication_template" class="row education">
+        {{#Categories}}
+        <div class="three columns header-col">
+            <h1><span>{{categoryName}}</span></h1>
+        </div>
+
+        <div id="publication_list" class="nine columns main-col">
+
+            <div class="row item">
+                
+                <div class="twelve columns">
+                    {{description}}
+                    <ol start="{{Start}}">
+                        {{#Items}}
+                        <li>
+                            {{#URL}}<a href="{{URL}}">{{/URL}}{{TITLE}} {{#URL}}</a>{{/URL}}
+                            {{#COMMENT}} <span class="label label-primary">{{COMMENT}}</span>{{/COMMENT}}
+                            {{#NOTE}}<span class="label label-default"> {{NOTE}} </span>{{/NOTE}}
+                            </br>
+                            <span class="info"> {{AUTHOR}}  <span>&nbsp;&bull;&nbsp;</span> <em class="date"> {{YEAR}} </em>  </br>
+                            {{BOOKTITLE}}{{JOURNAL}}
+                            <div class="btn-group">
+                                {{#URL}} <a href="{{URL}}"  data-toggle="modal" class="btn btn-default btn-xs"> pdf </a> {{/URL}}
+                                {{#SLIDES}} <a href="{{SLIDES}}" class="btn btn-default btn-xs"> slides </a> {{/SLIDES}}
+                                {{#CODE}} <a href="{{CODE}}" class="btn btn-default btn-xs"> code </a> {{/CODE}}
+                                                           </div>
+                            </span>
+
+                        </li>
+                        {{/Items}}
+                    </ol>
+                    
+                </div>
+                
+            </div> <!-- item end -->
+
+        </div> <!-- main-col end -->
+
+        {{/Categories}}
+        
+    </div> <!-- End Publications -->
+    
+    
+    
+    
+    
+    
+</section> <!-- Resume Section End-->
+
+    <a href="http://www4.clustrmaps.com/user/07f1047f8"><img src="http://www4.clustrmaps.com/stats/maps-no_clusters/www.josepablogonzalez.com-thumb.jpg" alt="Locations of visitors to this page" width="1" /></a>
+
+   <!-- footer
+   ================================================== -->
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <!-- <ul class="social-links">
+               <li><a href="#"><i class="fa fa-facebook"></i></a></li>
+               <li><a href="#"><i class="fa fa-twitter"></i></a></li>
+               <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
+               <li><a href="#"><i class="fa fa-linkedin"></i></a></li>
+               <li><a href="#"><i class="fa fa-instagram"></i></a></li>
+               <li><a href="#"><i class="fa fa-dribbble"></i></a></li>
+               <li><a href="#"><i class="fa fa-skype"></i></a></li>
+            </ul> -->
+
+            <ul class="copyright">
+               <li>&copy; Copyright 2015 Jos&eacute; P. Gonz&aacute;lez-Brenes</li>
+               <li>Design by <a title="Styleshout" href="http://www.styleshout.com/">Styleshout</a></li>   
+            </ul>
+
+         </div>
+
+         <div id="go-top"><a class="smoothscroll" title="Back to Top" href="#home"><i class="icon-up-open"></i></a></div>
+
+      </div>
+
+   </footer> <!-- Footer End-->
+
+   <!-- Java Script
+   ================================================== -->
+   <script type="text/javascript" src="js/jquery-migrate-1.2.1.min.js"></script>
+
+   <script src="js/jquery.flexslider.js"></script>
+   <script src="js/waypoints.js"></script>
+   <script src="js/jquery.fittext.js"></script>
+   <script src="js/magnific-popup.js"></script>
+   <script src="js/init.js"></script>
+</body>
+
+</html>
