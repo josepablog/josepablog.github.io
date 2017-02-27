@@ -137,7 +137,7 @@
 	$(document).ready(function()
                       {
                         publication_template = $("#publication_template").html(); //global var
-                        $.get('bibliography.bib', render_bib, 'text', cache=false);
+                        $.ajax({url:'bibliography.bib', success:render_bib, dataType:'text', cache:false});
                       });
     </script>
 	
@@ -478,15 +478,15 @@
                             {{#COMMENT}} <span class="label label-primary">{{COMMENT}}</span>{{/COMMENT}}
                             {{#NOTE}}<span class="label label-default"> {{NOTE}} </span>{{/NOTE}}
                             </br>
-                            <span class="info"> {{AUTHOR}}  <span>&nbsp;&bull;&nbsp;</span> <em class="date"> {{YEAR}} </em>  </br>
-                            {{#EDITOR}} {{EDITOR}} (eds) </br> {{/EDITOR}}
+                            <span class="info"> <i> {{AUTHOR}} </i> <span>&nbsp;&bull;&nbsp;</span> <em class="date"> {{YEAR}} </em></span> </br>
+                            {{#EDITOR}}  {{EDITOR}} (eds) </br> {{/EDITOR}}
                             {{BOOKTITLE}}{{JOURNAL}}
                             <div class="btn-group">
                                 {{#URL}} <a href="{{URL}}"  data-toggle="modal" class="btn btn-default btn-xs"> pdf </a> {{/URL}}
                                 {{#SLIDES}} <a href="{{SLIDES}}" class="btn btn-default btn-xs"> slides </a> {{/SLIDES}}
                                 {{#CODE}} <a href="{{CODE}}" class="btn btn-default btn-xs"> code </a> {{/CODE}}
                                                            </div>
-                            </span>
+
 
                         </li>
                         {{/Items}}
